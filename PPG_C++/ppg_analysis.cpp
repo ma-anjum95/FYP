@@ -13,8 +13,8 @@ namespace PPG
 		this->ppg_red_ac = NULL;
 		this->ppg_ir_ac = NULL;
 		
-		this->ppg_red_dc = NULL;
-		this->ppg_ir_dc = NULL;
+		this->ppg_red_dc = 0;
+		this->ppg_ir_dc = 0;
 
 		this->ppg_red_lines = new vector<PPGLines>;
 		this->ppg_ir_lines = new vector<PPGLines>;

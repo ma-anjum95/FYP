@@ -32,6 +32,4 @@ int main(void)
 	ppg_analysis.run(arr, arr, window_size, samp_freq);
 	cout << ppg_analysis.get_hr() << " " << ppg_analysis.get_rr() << " " << ppg_analysis.get_spo2() << endl;
 
-	int tmp;
-	cin >> tmp;
 }
