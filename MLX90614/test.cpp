@@ -8,7 +8,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
-//#include <stdint.h>
 #include "mlx90614.h"
 #define AVG 1   //averaging samples
  
