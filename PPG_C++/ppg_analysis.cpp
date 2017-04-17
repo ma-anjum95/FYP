@@ -138,13 +138,13 @@ namespace PPG
 		// 4 - Beats with less than 50 % of previous valid interbeat - interval
 
 		// Calculating the value of ThAlow and ThAhigh which are amplitude limits.
-		int ThAhigh = 20;
-		int ThAlow = 5;
+		int ThAhigh = 1500;
+		int ThAlow = 250;
 
 		// Beat thresholds within with the human heart beat remains
 		// Heart beat must remain between 230ms to 2400ms.
-		double Period_Low_Limit = .23 * this->samp_freq; // 230ms
-		double Period_High_Limit = 2.4 * this->samp_freq; // 2400ms
+		double Period_Low_Limit = .23 * this->samp_freq / 2; // 230ms
+		double Period_High_Limit = 2.4 * this->samp_freq / 2; // 2400ms
 
 		for (int i = 1, n = ppg_lines->size() - 1; i < n; i++) {
 			if ((ppg_lines[0][i].get_slope_dir() * ppg_lines[0][i - 1].get_slope_dir() >= 0) || (ppg_lines[0][i].get_slope_dir() * ppg_lines[0][i + 1].get_slope_dir() >= 0)) {
@@ -153,8 +153,8 @@ namespace PPG
 			else if ((ppg_lines[0][i].get_amp() > ThAhigh) || (ppg_lines[0][i].get_amp() < ThAlow)) {
 				continue;
 			} 
-			else if ((ppg_lines[0][i].get_period() + ppg_lines[0][i + 1].get_period() < Period_Low_Limit)
-				|| (ppg_lines[0][i].get_period() + ppg_lines[0][i + 1].get_period() > Period_High_Limit)) {
+			else if ((ppg_lines[0][i].get_period() < Period_Low_Limit)
+				|| (ppg_lines[0][i].get_period() > Period_High_Limit)) {
 				continue;
 			}
 			else {
