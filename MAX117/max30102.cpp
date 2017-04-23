@@ -106,10 +106,10 @@ bool maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *puch_data)
 	if (!bcm2835_i2c_begin())
 		return false;
 	bcm2835_i2c_setSlaveAddress(0x57);
-	
-    if (bcm2835_i2c_read_register_rs((char*)&uch_addr, (char*)puch_data, 1) != BCM2835_I2C_REASON_OK)
+
+	if (bcm2835_i2c_read_register_rs((char*)&uch_addr, (char*)puch_data, 1) != BCM2835_I2C_REASON_OK)
 		return false;
-    bcm2835_i2c_end();
+	bcm2835_i2c_end();
     
 	return true;
 }
@@ -177,24 +177,23 @@ bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
 	*pun_ir_led = 0;
 	*pun_red_led = 0;
 	  
-	//maxim_max30102_read_reg(REG_FIFO_WR_PTR , &cr2);
-	 //maxim_max30102_read_reg(REG_FIFO_RD_PTR, &cr1);	
+	// reading the status of read and write pointer and checking if they are in correct positions
+	maxim_max30102_read_reg(REG_FIFO_WR_PTR , &cr2);
+	maxim_max30102_read_reg(REG_FIFO_RD_PTR, &cr1);	
 	  
 	maxim_max30102_read_reg(REG_INTR_STATUS_1, &uch_temp);
 	maxim_max30102_read_reg(REG_INTR_STATUS_2, &uch_temp);
 	  
-	//cout << "cr1 : " << (int)cr1 << " cr2: " << (int)cr2 << endl;
 	if (!bcm2835_i2c_begin())
 		return false;  
 	bcm2835_i2c_setSlaveAddress(0x57);
 	
-	//if (cr2 - cr1 <= 0) 
-	//	return false;
+	if ((cr2 - cr1 + 32) % 32 <= 0) // 32 is the size of the array so we mod with that r < 0 ? r + b : r
+		return false;
 	if (bcm2835_i2c_write_read_rs((char*)buf, 1, (char*)un_temp, 6) != BCM2835_I2C_REASON_OK)
 		return false;
 	bcm2835_i2c_end();
-		
-	
+
 	*pun_red_led = (un_temp[0] << 16) | (un_temp[1] << 8) | un_temp[2];
 	*pun_ir_led = (un_temp[3] << 16) | (un_temp[4] << 8) | un_temp[5];
 	
