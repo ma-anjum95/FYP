@@ -62,6 +62,9 @@
 
 #include "max30102.h"
 
+#include <iostream>
+using namespace std;
+
 bool maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data)
 /**
 * \brief        Write a value to a MAX30102 register
@@ -78,8 +81,8 @@ bool maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data)
 	
 	if (!bcm2835_i2c_begin())
 		return false;
-	if (!bcm2835_i2c_setSlaveAddress(0x57))
-		return false;
+	bcm2835_i2c_setSlaveAddress(0x57);
+	
 	if (bcm2835_i2c_write((const char*)buf, 2) != BCM2835_I2C_REASON_OK)
 		return false;
 	bcm2835_i2c_end();
@@ -102,8 +105,8 @@ bool maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *puch_data)
   
 	if (!bcm2835_i2c_begin())
 		return false;
-	if (!bcm2835_i2c_setSlaveAddress(0x57))
-		return false;
+	bcm2835_i2c_setSlaveAddress(0x57);
+	
     if (bcm2835_i2c_read_register_rs((char*)&uch_addr, (char*)puch_data, 1) != BCM2835_I2C_REASON_OK)
 		return false;
     bcm2835_i2c_end();
@@ -168,20 +171,25 @@ bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
 */
 {
 	uint8_t un_temp[6] = {0};
-	uint8_t uch_temp;
+	uint8_t uch_temp, cr1, cr2;
 	uint8_t buf[1] = {REG_FIFO_DATA};
 	  
 	*pun_ir_led = 0;
 	*pun_red_led = 0;
 	  
+	//maxim_max30102_read_reg(REG_FIFO_WR_PTR , &cr2);
+	 //maxim_max30102_read_reg(REG_FIFO_RD_PTR, &cr1);	
+	  
 	maxim_max30102_read_reg(REG_INTR_STATUS_1, &uch_temp);
 	maxim_max30102_read_reg(REG_INTR_STATUS_2, &uch_temp);
 	  
-	
+	//cout << "cr1 : " << (int)cr1 << " cr2: " << (int)cr2 << endl;
 	if (!bcm2835_i2c_begin())
 		return false;  
-	if (!bcm2835_i2c_setSlaveAddress(0x57))
-		return false;
+	bcm2835_i2c_setSlaveAddress(0x57);
+	
+	//if (cr2 - cr1 <= 0) 
+	//	return false;
 	if (bcm2835_i2c_write_read_rs((char*)buf, 1, (char*)un_temp, 6) != BCM2835_I2C_REASON_OK)
 		return false;
 	bcm2835_i2c_end();
