@@ -78,6 +78,8 @@ bool maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data)
 	
 	if (!bcm2835_i2c_begin())
 		return false;
+	if (!bcm2835_i2c_setSlaveAddress(0x57))
+		return false;
 	if (bcm2835_i2c_write((const char*)buf, 2) != BCM2835_I2C_REASON_OK)
 		return false;
 	bcm2835_i2c_end();
@@ -99,6 +101,8 @@ bool maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *puch_data)
 {
   
 	if (!bcm2835_i2c_begin())
+		return false;
+	if (!bcm2835_i2c_setSlaveAddress(0x57))
 		return false;
     if (bcm2835_i2c_read_register_rs((char*)&uch_addr, (char*)puch_data, 1) != BCM2835_I2C_REASON_OK)
 		return false;
@@ -176,6 +180,8 @@ bool maxim_max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
 	
 	if (!bcm2835_i2c_begin())
 		return false;  
+	if (!bcm2835_i2c_setSlaveAddress(0x57))
+		return false;
 	if (bcm2835_i2c_write_read_rs((char*)buf, 1, (char*)un_temp, 6) != BCM2835_I2C_REASON_OK)
 		return false;
 	bcm2835_i2c_end();

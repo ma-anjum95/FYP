@@ -1,4 +1,9 @@
 PPG_C++/test
 MLX90614/test
 MAX117/test
+*.a
+*.o
+demo.cpp
+demo
+tmp.txt
 
