@@ -131,6 +131,10 @@ namespace PPG
 
 	void PPGAnalysis::ppg_artifact_removal(vector<PPGLines> *to_return, vector<PPGLines> *ppg_lines)
 	{
+		// if the number of segments are less than or equal to 2 just return as there is no use in running artifact removal
+		if (ppg_lines->size() <= 2)
+			return;
+
 		// The artifacts in the ppg lines will be of the following types :
 		// 1 - Lines before or after a horizontal line will be artifacts
 		// 2 - Lines having amplitudes exceeding the limits ThAhigh and ThAlow.
@@ -415,6 +419,11 @@ namespace PPG
 		return this->rr;
 	}
 
+	double PPGAnalysis::get_rr_std()
+	{
+		return this->rr_std;
+	}
+
 	void PPGAnalysis::run(double *ppg_red_raw, double *ppg_ir_raw, int window_size, int samp_freq) 
 	{		
 		// cleans the contents of vector before running the complete algorithm
@@ -440,42 +449,61 @@ namespace PPG
 		//this->ppg_artifact_removal(this->ppg_red_lines_processed, this->ppg_red_lines);
 		this->ppg_artifact_removal(this->ppg_ir_lines_processed, this->ppg_ir_lines);
 
-		// extracting the intensity waveform from the processed lines
-		//this->ppg_intensity_waveform(this->ppg_red_intensity_waveform, this->ppg_red_lines_processed);
-		this->ppg_intensity_waveform(this->ppg_ir_intensity_waveform, this->ppg_ir_lines_processed);
+		// if the number of segments after artifact removal are less than 3 we just return 0
+		if (this->ppg_ir_lines_processed->size() > 3) {
+			// extracting the intensity waveform from the processed lines
+			//this->ppg_intensity_waveform(this->ppg_red_intensity_waveform, this->ppg_red_lines_processed);
+			this->ppg_intensity_waveform(this->ppg_ir_intensity_waveform, this->ppg_ir_lines_processed);
 
-		// extracting the amplitude waveform from the processed lines
-		//this->ppg_amplitude_waveform(this->ppg_red_amplitude_waveform, this->ppg_red_lines_processed);
-		this->ppg_amplitude_waveform(this->ppg_ir_amplitude_waveform, this->ppg_ir_lines_processed);
+			// extracting the amplitude waveform from the processed lines
+			//this->ppg_amplitude_waveform(this->ppg_red_amplitude_waveform, this->ppg_red_lines_processed);
+			this->ppg_amplitude_waveform(this->ppg_ir_amplitude_waveform, this->ppg_ir_lines_processed);
 
-		// interpolating the waveform data from the processed lines
-		//this->linear_interpolation_with_freq(this->ppg_red_intensity_waveform_interp, this->ppg_red_intensity_waveform, this->samp_freq, 4);
-		this->linear_interpolation_with_freq(this->ppg_ir_intensity_waveform_interp, this->ppg_ir_intensity_waveform, this->samp_freq, 4);
+			// interpolating the waveform data from the processed lines
+			//this->linear_interpolation_with_freq(this->ppg_red_intensity_waveform_interp, this->ppg_red_intensity_waveform, this->samp_freq, 4);
+			this->linear_interpolation_with_freq(this->ppg_ir_intensity_waveform_interp, this->ppg_ir_intensity_waveform, this->samp_freq, 4);
 
-		//this->linear_interpolation_with_freq(this->ppg_red_amplitude_waveform_interp, this->ppg_red_amplitude_waveform, this->samp_freq, 4);
-		this->linear_interpolation_with_freq(this->ppg_ir_amplitude_waveform_interp, this->ppg_ir_amplitude_waveform, this->samp_freq, 4);
-		
-		// fft of the interpolated data
-		//this->ppg_waveform_fft(this->ppg_red_intensity_waveform_fft, this->ppg_red_intensity_waveform_interp, 4);
-		this->ppg_waveform_fft(this->ppg_ir_intensity_waveform_fft, this->ppg_ir_intensity_waveform_interp, 4);
+			//this->linear_interpolation_with_freq(this->ppg_red_amplitude_waveform_interp, this->ppg_red_amplitude_waveform, this->samp_freq, 4);
+			this->linear_interpolation_with_freq(this->ppg_ir_amplitude_waveform_interp, this->ppg_ir_amplitude_waveform, this->samp_freq, 4);
 
-		//this->ppg_waveform_fft(this->ppg_red_amplitude_waveform_fft, this->ppg_red_amplitude_waveform_interp, 4);
-		this->ppg_waveform_fft(this->ppg_ir_amplitude_waveform_fft, this->ppg_ir_amplitude_waveform_interp, 4);
+			// fft of the interpolated data
+			//this->ppg_waveform_fft(this->ppg_red_intensity_waveform_fft, this->ppg_red_intensity_waveform_interp, 4);
+			this->ppg_waveform_fft(this->ppg_ir_intensity_waveform_fft, this->ppg_ir_intensity_waveform_interp, 4);
 
-		// finding maximum value in fft in range of respiratory freq
-		//this->ppg_red_intensity_fft_max = this->find_max_in_range(this->ppg_red_intensity_waveform_fft, 0.067, 1.08);
-		this->ppg_ir_intensity_fft_max = this->find_max_in_range(this->ppg_ir_intensity_waveform_fft, 0.067, 1.08);
+			//this->ppg_waveform_fft(this->ppg_red_amplitude_waveform_fft, this->ppg_red_amplitude_waveform_interp, 4);
+			this->ppg_waveform_fft(this->ppg_ir_amplitude_waveform_fft, this->ppg_ir_amplitude_waveform_interp, 4);
 
-		//this->ppg_red_amplitude_fft_max = this->find_max_in_range(this->ppg_red_amplitude_waveform_fft, 0.067, 1.08);
-		this->ppg_ir_amplitude_fft_max = this->find_max_in_range(this->ppg_ir_amplitude_waveform_fft, 0.067, 1.08);
+			// finding maximum value in fft in range of respiratory freq
+			//this->ppg_red_intensity_fft_max = this->find_max_in_range(this->ppg_red_intensity_waveform_fft, 0.067, 1.08);
+			this->ppg_ir_intensity_fft_max = this->find_max_in_range(this->ppg_ir_intensity_waveform_fft, 0.067, 1.08);
 
-		// extracting the heart rate from the intensity waveform
-		this->hr = this->ppg_heart_rate(this->ppg_ir_intensity_waveform);
+			//this->ppg_red_amplitude_fft_max = this->find_max_in_range(this->ppg_red_amplitude_waveform_fft, 0.067, 1.08);
+			this->ppg_ir_amplitude_fft_max = this->find_max_in_range(this->ppg_ir_amplitude_waveform_fft, 0.067, 1.08);
 
-		// extracting spO2 from the singals
-		this->spo2 = this->ppg_spo2(this->ppg_red_ac, this->ppg_red_dc, this->ppg_ir_ac, this->ppg_ir_dc);
+			// extracting the heart rate from the intensity waveform
+			this->hr = this->ppg_heart_rate(this->ppg_ir_intensity_waveform);
 
-		// extracting rr from the signals
-		this->rr = this->ppg_calculate_rr(this->ppg_ir_intensity_fft_max, this->ppg_ir_amplitude_fft_max).get_x();
+			// extracting spO2 from the singals
+			this->spo2 = this->ppg_spo2(this->ppg_red_ac, this->ppg_red_dc, this->ppg_ir_ac, this->ppg_ir_dc);
+
+			// extracting rr from the signals
+			this->rr = this->ppg_calculate_rr(this->ppg_ir_intensity_fft_max, this->ppg_ir_amplitude_fft_max).get_x();
+
+			// setting the standard deviations of different heart rate variations
+			this->rr_std = this->ppg_calculate_rr(this->ppg_ir_intensity_fft_max, this->ppg_ir_amplitude_fft_max).get_y();
+		}
+		else {
+			// extracting the heart rate from the intensity waveform
+			this->hr = 0;
+
+			// extracting spO2 from the singals
+			this->spo2 = this->ppg_spo2(this->ppg_red_ac, this->ppg_red_dc, this->ppg_ir_ac, this->ppg_ir_dc);
+
+			// extracting rr from the signals
+			this->rr = 0;
+
+			// setting the standard deviations of different heart rate variations
+			this->rr_std = 0;
+		}
 	}
 }

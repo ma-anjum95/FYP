@@ -45,6 +45,7 @@ namespace PPG
 		double hr;
 		double spo2;
 		double rr;
+		double rr_std;
 
 		// cleans the contents of the vectors
 		void clean_vectors(void);
@@ -104,6 +105,7 @@ namespace PPG
 		double get_hr();
 		double get_spo2();
 		double get_rr();
+		double get_rr_std();
 	};
 }
 
