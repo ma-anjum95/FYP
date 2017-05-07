@@ -497,7 +497,7 @@ namespace PPG
 			this->hr = 0;
 
 			// extracting spO2 from the singals
-			this->spo2 = this->ppg_spo2(this->ppg_red_ac, this->ppg_red_dc, this->ppg_ir_ac, this->ppg_ir_dc);
+			this->spo2 = 0;
 
 			// extracting rr from the signals
 			this->rr = 0;
