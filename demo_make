@@ -1,0 +1,13 @@
+#!/bin/bash
+g++ -std=c++11 -o MAX117/max30102.o -c MAX117/max30102.cpp
+
+g++ -std=c++11 -o PPG_C++/kiss_fft.o -c PPG_C++/kiss_fft.c
+g++ -std=c++11 -o PPG_C++/ppg_analysis.o -c PPG_C++/ppg_analysis.cpp
+g++ -std=c++11 -o PPG_C++/point.o -c PPG_C++/point.cpp
+g++ -std=c++11 -o PPG_C++/ppg_lines.o -c PPG_C++/ppg_lines.cpp
+
+ar rcs libmax30102.a MAX117/max30102.o
+
+ar rcs libppg.a PPG_C++/kiss_fft.o PPG_C++/ppg_analysis.o PPG_C++/point.o PPG_C++/ppg_lines.o
+
+g++ -std=c++11 -o demo demo.cpp -L . -lmax30102 -lppg -lbcm2835
