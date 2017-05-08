@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <thread>
+#include <sstream>
 
 #include <chrono>
 
@@ -18,8 +19,61 @@ using namespace std::chrono;
 using namespace std;
 using namespace PPG;
 
-double *linear_interp_10(vector<double> to_interp, int start_index);
+//double *linear_interp_10(vector<double> to_interp, int start_index);
 
+int main() 
+{
+	uint32_t tmp1, tmp2;
+	vector<double> ppg_red, ppg_ir;
+	int i = 0, patient = 0;
+	ifstream infile;
+	ofstream outfile;
+	
+	cout << "Keep your finger stable and do not talk during the session." << endl;
+	cout << "This test will take 2 minutes please be patient." << endl;
+	cout << "The values on the screen will go upto: " << 2 * 60 * 25 << endl;
+	
+	if (!maxim_max30102_init()) {
+		cout << "failure initializing max30102" << endl;
+		return 1;	
+	}
+	
+	while(ppg_red.size() < 60*2*25) {
+		if (maxim_max30102_read_fifo(&tmp1, &tmp2)) {
+			ppg_red.push_back((double)tmp1);
+			ppg_ir.push_back((double)tmp2);
+			
+			cout << ++i << endl;
+		}
+	}
+	
+	cout << "Thank you for your patience," << endl;
+	
+	
+	// All the calculations for the patient data storage
+	infile.open("tmp.txt");
+	infile >> patient;
+	infile.close();
+	
+	cout << "Your patient number is: " << patient << endl;
+	outfile.open("tmp.txt");
+	outfile << patient + 1;
+	outfile.close();
+	
+	char filename[25];
+	sprintf(filename, "./data/patient_%.3d.txt", patient);
+	
+	outfile.open(filename, std::fstream::out);
+	
+	for (int i = 0; i < ppg_red.size(); i++) {
+		outfile << ppg_red[i] << " " << ppg_ir[i] << endl;
+	}
+	
+	outfile.close();
+	cin >> i;
+}
+
+/*
 int main() 
 {
 	cout << "Please wait 20 seconds before the values start to display." << endl;
@@ -85,4 +139,4 @@ double *linear_interp_10(vector<double> to_interp, int start_index)
 	}
 
 	return to_return;
-}
+}*/
