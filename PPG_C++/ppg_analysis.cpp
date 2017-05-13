@@ -221,8 +221,13 @@ namespace PPG
 		double x0, y0, x1, y1;
 
 		// creating a new index array for the new_freq
+		int prev_index = -1;
 		for (int i = 0, n = len; i < n; i++) {
 			new_index[i] = round(freq_ratio * data[0][i].get_x());
+			// if the previous new index and the current new index are equal add one to the the new index
+			if (prev_index == new_index[i])
+				new_index[i] += 1;
+			prev_index = new_index[i];
 		}
 
 		// we need to calculate slope of the data
