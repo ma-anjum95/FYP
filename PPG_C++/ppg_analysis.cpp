@@ -278,7 +278,7 @@ namespace PPG
 
 		double R = (ppg_ac_rms_red / ppg_red_dc) / (ppg_ac_rms_ir / ppg_ir_dc);
 
-		spo2 = 110 - 25 * R;
+		spo2 = -45.060*R*R/10000 + 30.354 *R/100 + 94.845;
 
 		return spo2;
 	}
