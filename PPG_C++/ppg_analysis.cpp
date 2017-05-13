@@ -253,20 +253,24 @@ namespace PPG
 		
 	}
 
-	double PPGAnalysis::ppg_heart_rate(vector<Point> *ppg_intensity_waveform)
+	double PPGAnalysis::ppg_heart_rate(vector<PPGLines> *ppg_lines_processed)
 	{
-		double heart_rate = 0;
-		int length = ppg_intensity_waveform->size();
-		
-		double start_loc = ppg_intensity_waveform[0][0].get_x(); // starting location of the first waveform element
-		double end_loc = ppg_intensity_waveform[0][length - 1].get_x(); // starting location final waveform element
+		double sum = 0;
+		double j = 0;
 
-		double window = end_loc - start_loc;
-		double time = window / this->samp_freq;
+		for (int i = 0; i < ppg_lines_processed->size() - 1; i++) {
+			if (ppg_lines_processed[0][i].get_slope_dir() == 1) {
+				if (ppg_lines_processed[0][i + 1].get_slope_dir() == -1) {
+					sum += ppg_lines_processed[0][i].get_period() + ppg_lines_processed[0][i + 1].get_period();
+					j++;
+				}
+			}
+		}
 
-		heart_rate = ((double)(length - 1) / time) * 60; // beats per minute
-
-		return heart_rate;
+		if (j == 0)
+			return 0;
+		else
+			return (double)(j / sum) * 60.0 * this->samp_freq ;
 	}
 
 	double PPGAnalysis::ppg_spo2(double *ppg_red_ac, double ppg_red_dc, double *ppg_ir_ac, double ppg_ir_dc)
@@ -481,7 +485,7 @@ namespace PPG
 			this->ppg_ir_amplitude_fft_max = this->find_max_in_range(this->ppg_ir_amplitude_waveform_fft, 0.067, 1.08);
 
 			// extracting the heart rate from the intensity waveform
-			this->hr = this->ppg_heart_rate(this->ppg_ir_intensity_waveform);
+			this->hr = this->ppg_heart_rate(this->ppg_ir_lines_processed);
 
 			// extracting spO2 from the singals
 			this->spo2 = this->ppg_spo2(this->ppg_red_ac, this->ppg_red_dc, this->ppg_ir_ac, this->ppg_ir_dc);

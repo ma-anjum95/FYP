@@ -73,7 +73,7 @@ namespace PPG
 
 		// extract the heart rate from the intensity waveform
 		// we will be using the ir waveform since it is much clearer and noise free
-		double ppg_heart_rate(vector<Point> *ppg_intensity_waveform);
+		double ppg_heart_rate(vector<PPGLines> *ppg_lines_processed);
 
 		// extracting the spo2 from both the signal
 		double ppg_spo2(double *ppg_red_ac, double ppg_red_dc, double *ppg_ir_ac, double ppg_ir_dc);
