@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>582</width>
+    <width>640</width>
     <height>564</height>
    </rect>
   </property>
@@ -35,7 +35,7 @@
          </sizepolicy>
         </property>
         <property name="styleSheet">
-         <string notr="true">border-image: url(:/PIC- right.jpg);</string>
+         <string notr="true">border-image: url(:/PIC-right.jpg);</string>
         </property>
         <property name="text">
          <string>                   .</string>

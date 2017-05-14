@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>border2.png</file>
-        <file>PIC- right.jpg</file>
+        <file>PIC-right.jpg</file>
         <file>PIC-left.PNG</file>
         <file>Picture1.png</file>
         <file>tel-pic.PNG</file>
