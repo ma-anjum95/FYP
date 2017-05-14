@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>picban.PNG</file>
+        <file>Picture1.png</file>
+        <file>../Desktop/PIC-left.PNG</file>
+        <file>../Desktop/PIC- right.jpg</file>
+        <file>../Desktop/picban.PNG</file>
+        <file>../Desktop/Picture1.png</file>
+        <file>../Desktop/border.jpg</file>
+        <file>../Desktop/border-1.jpg</file>
+        <file>../Desktop/border2.png</file>
+    </qresource>
+</RCC>
