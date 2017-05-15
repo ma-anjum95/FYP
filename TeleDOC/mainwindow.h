@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    void makePlot(int x[],int length_x);
+    void makePlot(double *ppg_ir, int length);
     ~MainWindow();
 
 signals:

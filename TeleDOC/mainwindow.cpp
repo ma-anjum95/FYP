@@ -33,24 +33,28 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::makePlot(int y[],int length_y)
+void MainWindow::makePlot(double *ppg_ir, int length)
 {
-    //array y for y axis
-    //array x for x axis
-    int *x = new int[length_y];
-//making an array of iterations for the x axis
-    for (int i=0; i<length_y; i++)
+    double max = -1, min = 180000000;
+    int *x = new int[length];
+
+    for (int i = 0; i < length; i++)
     {
-        x[i] = i;
+        x[i] = i + 1;
+        if (max < ppg_ir[i])
+            max = ppg_ir[i];
+
+        if (min > ppg_ir[i])
+            min = ppg_ir[i];
     }
 
     //converting array X to QVector
-    QVector<double> v(length_y);
-    qCopy(x, x+length_y, v.begin());
+    QVector<double> v(length);
+    qCopy(x, x+length, v.begin());
 
     //converting array Y to QVector
-    QVector<double> w(length_y);
-    qCopy(y, y+length_y, w.begin());
+    QVector<double> w(length);
+    qCopy(ppg_ir, ppg_ir+length, w.begin());
 
     //setting values to graph
     ui->CustomPlot->addGraph();
@@ -61,8 +65,8 @@ void MainWindow::makePlot(int y[],int length_y)
     ui->CustomPlot->yAxis->setLabel("y");
 
     //set ranges of axis
-    ui->CustomPlot->xAxis->setRange(0,100);
-    ui->CustomPlot->yAxis->setRange(0,100);
+    ui->CustomPlot->xAxis->setRange(0, length + 1);
+    ui->CustomPlot->yAxis->setRange(min, max);
 
     //plot
     ui->CustomPlot->replot();
@@ -70,16 +74,6 @@ void MainWindow::makePlot(int y[],int length_y)
 
 void MainWindow::on_pushButton_clicked()
 {
-    //dummy data for PPG graph
-    int x[101];
-    for (int i=0; i<101; i++)
-    {
-        x[i] = i;
-    }
-    int length_x = sizeof(x)/sizeof(*x);
-    //Add ppg value array here with its length
-    makePlot(x,length_x);
-
     // if the thread i
     if (!this->ppg_working)
         emit start_ppg();
@@ -93,6 +87,8 @@ void MainWindow::handle_ppg_results(double *ppg_red, double *ppg_ir,
     ui->lcdNumber_HR->display(hr);
     ui->lcdNumber_SPO2->display(spo2);
     ui->lcdNumber_RR->display(rr);
+
+    this->makePlot(ppg_ir, 5000);
 }
 
 void MainWindow::ppg_status(const bool &status)
