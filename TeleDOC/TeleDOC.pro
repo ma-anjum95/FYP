@@ -25,11 +25,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    qcustomplot.cpp
+    qcustomplot.cpp \
+    PPG_C++/point.cpp \
+    PPG_C++/ppg_analysis.cpp \
+    PPG_C++/ppg_lines.cpp \
+    PPG_C++/kiss_fft.c \
+    ppgworker.cpp
 
 HEADERS  += \
     mainwindow.h \
-    qcustomplot.h
+    qcustomplot.h \
+    PPG_C++/ppg_analysis.h \
+    PPG_C++/ppg_lines.h \
+    PPG_C++/point.h \
+    PPG_C++/kiss_fft.h \
+    PPG_C++/_kiss_fft_guts.h \
+    ppgworker.h
 
 FORMS    += mainwindow.ui
 

@@ -463,6 +463,29 @@ color: rgb(255, 255, 0);</string>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>PPG Status:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="ppg_status">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Off</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_7">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -483,7 +506,7 @@ background-color: rgb(0, 85, 127);
 color: rgb(255, 255, 255);</string>
         </property>
         <property name="text">
-         <string>              START             </string>
+         <string>            START             </string>
         </property>
        </widget>
       </item>
