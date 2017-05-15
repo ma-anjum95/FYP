@@ -7,6 +7,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    ui->CustomPlot->xAxis->setVisible(false);
+
     this->ppg_worker = new PPGWorker;
     this->ppg_worker->moveToThread(&this->ppg_thread);
 
@@ -60,10 +63,6 @@ void MainWindow::makePlot(double *ppg_ir, int length)
     ui->CustomPlot->addGraph();
     ui->CustomPlot->graph(0)->setData(v,w);
 
-    //set names of axis
-    ui->CustomPlot->xAxis->setLabel("x");
-    ui->CustomPlot->yAxis->setLabel("y");
-
     //set ranges of axis
     ui->CustomPlot->xAxis->setRange(0, length + 1);
     ui->CustomPlot->yAxis->setRange(min, max);
@@ -98,10 +97,21 @@ void MainWindow::ppg_status(const bool &status)
     if (status == true) {
         ui->pushButton->setText("            STOP              ");
         ui->ppg_status->setText("On");
+
+        QPalette pal = ui->pushButton->palette();
+        pal.setColor(QPalette::Button, QColor(Qt::red));
+        ui->pushButton->setAutoFillBackground(true);
+        ui->pushButton->setPalette(pal);
+        ui->pushButton->update();
     }
      else {
         ui->pushButton->setText("            START             ");
         ui->ppg_status->setText("Off");
 
+        QPalette pal = ui->pushButton->palette();
+        pal.setColor(QPalette::Button, QColor(Qt::green));
+        ui->pushButton->setAutoFillBackground(true);
+        ui->pushButton->setPalette(pal);
+        ui->pushButton->update();
     }
 }
