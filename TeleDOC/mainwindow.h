@@ -25,12 +25,14 @@ signals:
     void stop_ppg();
     void get_ppg_status();
     void save_ppg(const int &id);
+    void ppg_update(const int &update);
 
 private slots:
     //void makePlot();
     void on_start_button_clicked();
     void on_save_button_clicked();
     void update_time();
+    void radio_toggled();
 
 public slots:
     void handle_ppg_results(double *ppg_red, double *ppg_ir,double hr, double rr, double spo2);

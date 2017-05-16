@@ -27,6 +27,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->ppg_worker, &PPGWorker::ppg_samples,
             this, &MainWindow::ppg_samples);
 
+    connect(ui->radio_1, &QRadioButton::toggled, this, &MainWindow::radio_toggled);
+    connect(ui->radio_5, &QRadioButton::toggled, this, &MainWindow::radio_toggled);
+    connect(ui->radio_20, &QRadioButton::toggled, this, &MainWindow::radio_toggled);
+    connect(this, &MainWindow::ppg_update, this->ppg_worker, &PPGWorker::ppg_update);
+
     this->ppg_thread.start();
 
     this->ppg_working = false;
@@ -168,4 +173,14 @@ void MainWindow::ppg_samples(const int &samples)
     char tmp[10];
     sprintf(tmp, "%d", samples);
     ui->ppg_samples->setText(tmp);
+}
+
+void MainWindow::radio_toggled()
+{
+    if (ui->radio_1->isChecked())
+        emit ppg_update(1 * 25);
+    else if (ui->radio_5->isChecked())
+        emit ppg_update(5 * 25);
+    else if (ui->radio_20->isChecked())
+        emit ppg_update(20 * 25);
 }

@@ -90,3 +90,9 @@ double *PPGWorker::linear_interp_10(vector<double> to_interp, int start_index)
 
     return to_return;
 }
+
+
+void PPGWorker::ppg_update(const int &update)
+{
+    this->update = update;
+}

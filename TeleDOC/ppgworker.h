@@ -21,6 +21,7 @@ public slots:
     void ppg_stop();
     void ppg_status();
     void ppg_save(const int &id);
+    void ppg_update(const int &update);
 
 private:
     PPG::PPGAnalysis ppg_analysis;
