@@ -51,14 +51,17 @@ void PPGWorker::ppg_save(const int &id)
 {
     char tmp[22];
     // saves the patients data in a file with given id
-    sprintf(tmp, "data/patient_%03d.txt", id);
-    ofstream file(tmp);
+    sprintf(tmp, "./data/patient_%03d.txt", id);
+    ofstream file;
+    file.open(tmp);
+
     for (int i = 0; i < this->ppg_ir.size(); i++) {
         file << ppg_red[i] << " " << ppg_ir[i] << endl;
     }
     ppg_red.clear();
     ppg_ir.clear();
     this->last_index = 0;
+    file.close();
 }
 
 double *PPGWorker::linear_interp_10(vector<double> to_interp, int start_index)
