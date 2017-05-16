@@ -22,10 +22,21 @@ MainWindow::MainWindow(QWidget *parent) :
             this->ppg_worker, &PPGWorker::ppg_status);
     connect(this->ppg_worker, &PPGWorker::return_ppg_status,
             this, &MainWindow::ppg_status);
+    connect(this, &MainWindow::save_ppg,
+            this->ppg_worker, &PPGWorker::ppg_save);
 
     this->ppg_thread.start();
 
     this->ppg_working = false;
+
+    // The timer for displaying time
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout,
+            this, &MainWindow::update_time);
+    timer->start(1000);
+    this->time_passed = 0;
+    this->update_time();
+
 }
 
 MainWindow::~MainWindow()
@@ -71,13 +82,16 @@ void MainWindow::makePlot(double *ppg_ir, int length)
     ui->CustomPlot->replot();
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_start_button_clicked()
 {
     // if the thread i
-    if (!this->ppg_working)
+    if (!this->ppg_working) {
         emit start_ppg();
-    else
+    }
+    else {
         emit stop_ppg();
+
+    }
 }
 
 void MainWindow::handle_ppg_results(double *ppg_red, double *ppg_ir,
@@ -91,27 +105,57 @@ void MainWindow::handle_ppg_results(double *ppg_red, double *ppg_ir,
 }
 
 void MainWindow::ppg_status(const bool &status)
-{
+{ static int i = 10;
     this->ppg_working = status;
 
-    if (status == true) {
-        ui->pushButton->setText("            STOP              ");
+
+        ui->lcdNumber_HR->display(i++);
+    if (status) {
+        ui->start_button->setText("            STOP              ");
         ui->ppg_status->setText("On");
 
-        QPalette pal = ui->pushButton->palette();
+        QPalette pal = ui->start_button->palette();
         pal.setColor(QPalette::Button, QColor(Qt::red));
-        ui->pushButton->setAutoFillBackground(true);
-        ui->pushButton->setPalette(pal);
-        ui->pushButton->update();
+        ui->start_button->setAutoFillBackground(true);
+        ui->start_button->setPalette(pal);
+        ui->start_button->update();
+
+        ui->save_button->setEnabled(false);
     }
      else {
-        ui->pushButton->setText("            START             ");
+        ui->start_button->setText("            START             ");
         ui->ppg_status->setText("Off");
 
-        QPalette pal = ui->pushButton->palette();
+        QPalette pal = ui->start_button->palette();
         pal.setColor(QPalette::Button, QColor(Qt::green));
-        ui->pushButton->setAutoFillBackground(true);
-        ui->pushButton->setPalette(pal);
-        ui->pushButton->update();
+        ui->start_button->setAutoFillBackground(true);
+        ui->start_button->setPalette(pal);
+        ui->start_button->update();
+
+        ui->save_button->setEnabled(true);
     }
+}
+
+void MainWindow::update_time()
+{
+    // if ppg is working we update time
+    if (this->ppg_working) {
+        this->time_passed++;
+    }
+
+    // display the time on the screen
+
+}
+
+void MainWindow::on_save_button_clicked()
+{
+    char tmp[3];
+
+    static int id = 0;
+
+    emit save_ppg(id++);
+
+    // sets the patients id
+    sprintf(tmp, "%03d", id);
+    ui->patient_id->setText(tmp);
 }

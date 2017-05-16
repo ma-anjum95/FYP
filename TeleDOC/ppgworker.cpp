@@ -2,11 +2,6 @@
 
 void PPGWorker::ppg_work()
 {
-    vector<double> ppg_red;
-    vector<double> ppg_ir;
-    int last_index = 0;
-    signed int i = 0, update=125;
-
     double tmp1, tmp2;
 
     double *interp_red, *interp_ir;
@@ -20,21 +15,23 @@ void PPGWorker::ppg_work()
     while(exec_ppg_thread) {
         // getting the ppg data from the sensors
         file >> tmp1 >> tmp2;
-        ppg_red.push_back(tmp1);
-        ppg_ir.push_back(tmp2);
+        this->ppg_red.push_back(tmp1);
+        this->ppg_ir.push_back(tmp2);
         QThread::msleep(40);
 
-        while (i < (signed) ppg_red.size() - 500) {
-            interp_red = linear_interp_10(ppg_red, i);
-            interp_ir = linear_interp_10(ppg_ir, i);
+        while (this->last_index < (signed) this->ppg_red.size() - 500) {
+            interp_red = linear_interp_10(this->ppg_red, this->last_index);
+            interp_ir = linear_interp_10(this->ppg_ir, this->last_index);
 
             ppg_analysis.run(interp_red, interp_ir, 5000, 250);
 
             emit resultsReady(interp_red, interp_ir, ppg_analysis.get_hr(), ppg_analysis.get_rr(), ppg_analysis.get_spo2());
 
-            i += update;
+            this->last_index += update;
         }
 
+        // dont remove this as this will help calling other functions
+        QApplication::processEvents();
     }
 
 }
@@ -48,6 +45,20 @@ void PPGWorker::ppg_stop()
 void PPGWorker::ppg_status()
 {
     emit return_ppg_status(this->exec_ppg_thread);
+}
+
+void PPGWorker::ppg_save(const int &id)
+{
+    char tmp[22];
+    // saves the patients data in a file with given id
+    sprintf(tmp, "data/patient_%03d.txt", id);
+    ofstream file(tmp);
+    for (int i = 0; i < this->ppg_ir.size(); i++) {
+        file << ppg_red[i] << " " << ppg_ir[i] << endl;
+    }
+    ppg_red.clear();
+    ppg_ir.clear();
+    this->last_index = 0;
 }
 
 double *PPGWorker::linear_interp_10(vector<double> to_interp, int start_index)
