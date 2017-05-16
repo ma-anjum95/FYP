@@ -3,39 +3,39 @@
 void PPGWorker::ppg_work()
 {
     double tmp1, tmp2;
-
     double *interp_red, *interp_ir;
 
-    std::ifstream file;
-    file.open("E:\\patient_001.txt");
-
-    exec_ppg_thread = true;
-    emit return_ppg_status(this->exec_ppg_thread);
+    if (!maxim_max30102_init()) {
+        emit ppg_device_failt();
+    } else {
+        exec_ppg_thread = true;
+        emit return_ppg_status(this->exec_ppg_thread);
+    }
 
     while(exec_ppg_thread) {
         // getting the ppg data from the sensors
-        file >> tmp1 >> tmp2;
-        this->ppg_red.push_back(tmp1);
-        this->ppg_ir.push_back(tmp2);
-        emit ppg_samples(ppg_red.size());
-        QThread::msleep(40);
+        if (maxim_max30102_read_fifo(&tmp1, &tmp2)) {
+            this->ppg_red.push_back(tmp1);
+            this->ppg_ir.push_back(tmp2);
 
-        while (this->last_index < (signed) this->ppg_red.size() - 500) {
-            interp_red = linear_interp_10(this->ppg_red, this->last_index);
-            interp_ir = linear_interp_10(this->ppg_ir, this->last_index);
+            emit ppg_samples(ppg_red.size());
 
-            ppg_analysis.run(interp_red, interp_ir, 5000, 250);
+            while (this->last_index < (signed) this->ppg_red.size() - 500) {
+                interp_red = linear_interp_10(this->ppg_red, this->last_index);
+                interp_ir = linear_interp_10(this->ppg_ir, this->last_index);
 
-            emit resultsReady(interp_red, interp_ir, ppg_analysis.get_hr(), ppg_analysis.get_rr(),
-                              ppg_analysis.get_rr_std(), ppg_analysis.get_spo2());
+                ppg_analysis.run(interp_red, interp_ir, 5000, 250);
 
-            this->last_index += update;
+                emit resultsReady(interp_red, interp_ir, ppg_analysis.get_hr(), ppg_analysis.get_rr(),
+                                  ppg_analysis.get_rr_std(), ppg_analysis.get_spo2());
+
+                this->last_index += update;
+            }
+
+            // dont remove this as this will help calling other functions
+            QApplication::processEvents();
         }
-
-        // dont remove this as this will help calling other functions
-        QApplication::processEvents();
     }
-
 }
 
 void PPGWorker::ppg_stop()

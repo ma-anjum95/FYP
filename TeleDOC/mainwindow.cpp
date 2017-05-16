@@ -45,6 +45,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->radio_red, &QRadioButton::toggled, this, &MainWindow::radio_toggled);
     ui->radio_ir->setChecked(true);
 
+    connect(this->ppg_worker, &PPGWorker::ppg_device_fail,
+            this, &MainWindow::ppg_device_fail);
+
     this->ppg_thread.start();
 
     this->ppg_working = false;
@@ -185,4 +188,12 @@ void MainWindow::radio_toggled()
         this->display_ir = true;
     else if (ui->radio_red->isChecked())
         this->display_ir = false;
+}
+
+
+void MainWindow::ppg_device_fail()
+{
+    QMessageBox::critical(this, tr("MAX117 Initialization failure"),
+                       tr("The ppg device MAX117 failed to initialize. Please make sure it is connected."));
+
 }

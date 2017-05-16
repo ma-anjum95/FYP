@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <string>
 #include <QButtonGroup>
+#include <QMessageBox>
 #include "ppgworker.h"
 
 namespace Ui {
@@ -38,6 +39,7 @@ public slots:
     void handle_ppg_results(double *ppg_red, double *ppg_ir,double hr, double rr, double rr_std, double spo2);
     void ppg_status(const bool &status);
     void ppg_samples(const int &samples);
+    void ppg_device_fail();
 
 private:
     Ui::MainWindow *ui;

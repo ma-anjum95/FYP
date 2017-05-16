@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include "PPG_C++/ppg_analysis.h"
+#include "MAX117/max30102.h"
 
 class PPGWorker : public QObject
 {
@@ -15,6 +16,7 @@ signals:
     void resultsReady(double *ppg_red, double *ppg_ir, double hr, double rr, double rr_std, double spo2);
     void return_ppg_status(const bool &status);
     void ppg_samples(const int &samples);
+    void ppg_device_fail();
 
 public slots:
     void ppg_work();
