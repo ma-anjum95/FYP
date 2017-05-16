@@ -35,6 +35,7 @@ private slots:
 public slots:
     void handle_ppg_results(double *ppg_red, double *ppg_ir,double hr, double rr, double spo2);
     void ppg_status(const bool &status);
+    void ppg_samples(const int &samples);
 
 private:
     Ui::MainWindow *ui;

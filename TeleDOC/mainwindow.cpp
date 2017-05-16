@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::ppg_status);
     connect(this, &MainWindow::save_ppg,
             this->ppg_worker, &PPGWorker::ppg_save);
+    connect(this->ppg_worker, &PPGWorker::ppg_samples,
+            this, &MainWindow::ppg_samples);
 
     this->ppg_thread.start();
 
@@ -158,4 +160,12 @@ void MainWindow::on_save_button_clicked()
     // sets the patients id
     sprintf(tmp, "%03d", id);
     ui->patient_id->setText(tmp);
+}
+
+
+void MainWindow::ppg_samples(const int &samples)
+{
+    char tmp[10];
+    sprintf(tmp, "%d", samples);
+    ui->ppg_samples->setText(tmp);
 }

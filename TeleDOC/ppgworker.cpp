@@ -17,6 +17,7 @@ void PPGWorker::ppg_work()
         file >> tmp1 >> tmp2;
         this->ppg_red.push_back(tmp1);
         this->ppg_ir.push_back(tmp2);
+        emit ppg_samples(ppg_red.size());
         QThread::msleep(40);
 
         while (this->last_index < (signed) this->ppg_red.size() - 500) {

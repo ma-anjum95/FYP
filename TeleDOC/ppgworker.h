@@ -14,6 +14,7 @@ class PPGWorker : public QObject
 signals:
     void resultsReady(double *ppg_red, double *ppg_ir, double hr, double rr, double spo2);
     void return_ppg_status(const bool &status);
+    void ppg_samples(const int &samples);
 
 public slots:
     void ppg_work();
