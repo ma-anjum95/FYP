@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QTimer>
 #include <string>
+#include <QButtonGroup>
 #include "ppgworker.h"
 
 namespace Ui {
@@ -17,7 +18,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    void makePlot(double *ppg_ir, int length);
+
     ~MainWindow();
 
 signals:
@@ -31,11 +32,10 @@ private slots:
     //void makePlot();
     void on_start_button_clicked();
     void on_save_button_clicked();
-    void update_time();
     void radio_toggled();
 
 public slots:
-    void handle_ppg_results(double *ppg_red, double *ppg_ir,double hr, double rr, double spo2);
+    void handle_ppg_results(double *ppg_red, double *ppg_ir,double hr, double rr, double rr_std, double spo2);
     void ppg_status(const bool &status);
     void ppg_samples(const int &samples);
 
@@ -43,10 +43,15 @@ private:
     Ui::MainWindow *ui;
     PPGWorker *ppg_worker;
     QThread ppg_thread;
+    QButtonGroup update_radio_buttons;
+    QButtonGroup ppg_signal_buttons;
 
     // the boolean to keep track if the boolean is working
     bool ppg_working;
     qint64 time_passed;
+    bool display_ir = true; // displays ir on graph if true
+
+    void makePlot(double *ppg, int length);
 };
 
 #endif // MAINWINDOW_H

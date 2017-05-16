@@ -5,7 +5,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
-{
+{   
     ui->setupUi(this);
 
     ui->CustomPlot->xAxis->setVisible(false);
@@ -27,22 +27,27 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->ppg_worker, &PPGWorker::ppg_samples,
             this, &MainWindow::ppg_samples);
 
+    // adding update radio buttons in a qbuttongroup
+    this->update_radio_buttons.addButton(ui->radio_1);
+    this->update_radio_buttons.addButton(ui->radio_5);
+    this->update_radio_buttons.addButton(ui->radio_20);
+
     connect(ui->radio_1, &QRadioButton::toggled, this, &MainWindow::radio_toggled);
     connect(ui->radio_5, &QRadioButton::toggled, this, &MainWindow::radio_toggled);
     connect(ui->radio_20, &QRadioButton::toggled, this, &MainWindow::radio_toggled);
     connect(this, &MainWindow::ppg_update, this->ppg_worker, &PPGWorker::ppg_update);
+    ui->radio_5->setChecked(true);
+
+    this->ppg_signal_buttons.addButton(ui->radio_ir);
+    this->ppg_signal_buttons.addButton(ui->radio_red);
+
+    connect(ui->radio_ir, &QRadioButton::toggled, this, &MainWindow::radio_toggled);
+    connect(ui->radio_red, &QRadioButton::toggled, this, &MainWindow::radio_toggled);
+    ui->radio_ir->setChecked(true);
 
     this->ppg_thread.start();
 
     this->ppg_working = false;
-
-    // The timer for displaying time
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout,
-            this, &MainWindow::update_time);
-    timer->start(1000);
-    this->time_passed = 0;
-    this->update_time();
 
 }
 
@@ -54,7 +59,7 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::makePlot(double *ppg_ir, int length)
+void MainWindow::makePlot(double *ppg, int length)
 {
     double max = -1, min = 180000000;
     int *x = new int[length];
@@ -62,11 +67,11 @@ void MainWindow::makePlot(double *ppg_ir, int length)
     for (int i = 0; i < length; i++)
     {
         x[i] = i + 1;
-        if (max < ppg_ir[i])
-            max = ppg_ir[i];
+        if (max < ppg[i])
+            max = ppg[i];
 
-        if (min > ppg_ir[i])
-            min = ppg_ir[i];
+        if (min > ppg[i])
+            min = ppg[i];
     }
 
     //converting array X to QVector
@@ -75,7 +80,7 @@ void MainWindow::makePlot(double *ppg_ir, int length)
 
     //converting array Y to QVector
     QVector<double> w(length);
-    qCopy(ppg_ir, ppg_ir+length, w.begin());
+    qCopy(ppg, ppg+length, w.begin());
 
     //setting values to graph
     ui->CustomPlot->addGraph();
@@ -102,21 +107,23 @@ void MainWindow::on_start_button_clicked()
 }
 
 void MainWindow::handle_ppg_results(double *ppg_red, double *ppg_ir,
-                    double hr, double rr, double spo2)
+                    double hr, double rr, double rr_std, double spo2)
 {
     ui->lcdNumber_HR->display(hr);
     ui->lcdNumber_SPO2->display(spo2);
     ui->lcdNumber_RR->display(rr);
+    ui->lcdNumber_RR_STD->display(rr_std);
 
-    this->makePlot(ppg_ir, 5000);
+    if (this->display_ir)
+        this->makePlot(ppg_ir, 5000);
+    else
+        this->makePlot(ppg_red, 5000);
 }
 
 void MainWindow::ppg_status(const bool &status)
 { static int i = 10;
     this->ppg_working = status;
 
-
-        ui->lcdNumber_HR->display(i++);
     if (status) {
         ui->start_button->setText("            STOP              ");
         ui->ppg_status->setText("On");
@@ -143,16 +150,6 @@ void MainWindow::ppg_status(const bool &status)
     }
 }
 
-void MainWindow::update_time()
-{
-    // if ppg is working we update time
-    if (this->ppg_working) {
-        this->time_passed++;
-    }
-
-    // display the time on the screen
-
-}
 
 void MainWindow::on_save_button_clicked()
 {
@@ -183,4 +180,9 @@ void MainWindow::radio_toggled()
         emit ppg_update(5 * 25);
     else if (ui->radio_20->isChecked())
         emit ppg_update(20 * 25);
+
+    if (ui->radio_ir->isChecked())
+        this->display_ir = true;
+    else if (ui->radio_red->isChecked())
+        this->display_ir = false;
 }

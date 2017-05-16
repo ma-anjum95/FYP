@@ -26,7 +26,8 @@ void PPGWorker::ppg_work()
 
             ppg_analysis.run(interp_red, interp_ir, 5000, 250);
 
-            emit resultsReady(interp_red, interp_ir, ppg_analysis.get_hr(), ppg_analysis.get_rr(), ppg_analysis.get_spo2());
+            emit resultsReady(interp_red, interp_ir, ppg_analysis.get_hr(), ppg_analysis.get_rr(),
+                              ppg_analysis.get_rr_std(), ppg_analysis.get_spo2());
 
             this->last_index += update;
         }

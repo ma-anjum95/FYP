@@ -12,7 +12,7 @@ class PPGWorker : public QObject
 {
     Q_OBJECT
 signals:
-    void resultsReady(double *ppg_red, double *ppg_ir, double hr, double rr, double spo2);
+    void resultsReady(double *ppg_red, double *ppg_ir, double hr, double rr, double rr_std, double spo2);
     void return_ppg_status(const bool &status);
     void ppg_samples(const int &samples);
 
