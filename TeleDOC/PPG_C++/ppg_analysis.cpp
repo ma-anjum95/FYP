@@ -24,14 +24,20 @@ namespace PPG
 		this->ppg_ir_intensity_waveform = new vector<Point>;
 		this->ppg_red_amplitude_waveform = new vector<Point>;
 		this->ppg_ir_amplitude_waveform = new vector<Point>;
+        this->ppg_red_period_waveform = new vector<Point>;
+        this->ppg_ir_period_waveform = new vector<Point>;
 		this->ppg_red_intensity_waveform_interp = new vector<double>;
 		this->ppg_ir_intensity_waveform_interp = new vector<double>;
 		this->ppg_red_amplitude_waveform_interp = new vector<double>;
 		this->ppg_ir_amplitude_waveform_interp = new vector<double>;
+        this->ppg_red_period_waveform_interp = new vector<double>;
+        this->ppg_ir_period_waveform_interp = new vector<double>;
 		this->ppg_red_intensity_waveform_fft = new vector<Point>;
 		this->ppg_ir_intensity_waveform_fft = new vector<Point>;
 		this->ppg_red_amplitude_waveform_fft = new vector<Point>;
 		this->ppg_ir_amplitude_waveform_fft = new vector<Point>;
+        this->ppg_red_period_waveform_fft = new vector<Point>;
+        this->ppg_ir_period_waveform_fft = new vector<Point>;
 
 		this->hr = 0;
 		this->spo2 = 0;
@@ -48,10 +54,21 @@ namespace PPG
 		delete this->ppg_ir_intensity_waveform;
 		delete this->ppg_red_amplitude_waveform;
 		delete this->ppg_ir_amplitude_waveform;
+        delete this->ppg_red_period_waveform;
+        delete this->ppg_ir_period_waveform;
 		delete this->ppg_red_intensity_waveform_interp;
 		delete this->ppg_ir_intensity_waveform_interp;
 		delete this->ppg_red_amplitude_waveform_interp;
 		delete this->ppg_ir_amplitude_waveform_interp;
+        delete this->ppg_red_period_waveform_interp;
+        delete this->ppg_ir_period_waveform_interp;
+        delete this->ppg_red_intensity_waveform_fft;
+        delete this->ppg_ir_intensity_waveform_fft;
+        delete this->ppg_red_amplitude_waveform_fft;
+        delete this->ppg_ir_amplitude_waveform_fft;
+        delete this->ppg_red_period_waveform_fft;
+        delete this->ppg_ir_period_waveform_fft;
+
 	}
 
 	void PPGAnalysis::clean_vectors(void)
@@ -205,6 +222,16 @@ namespace PPG
 				to_return->push_back(Point(ppg_lines_processed[0][i].get_x1(), ppg_lines_processed[0][i].get_amp()));
 		}
 	}
+
+    void PPGAnalysis::ppg_period_waveform(vector<Point> *to_return, vector<PPGLines> *ppg_lines_processed)
+    {
+        for(int i = 0, n = ppg_lines_processed->size(); i < n - 1; i++) {
+            if (ppg_lines_processed[0][i].get_slope_dir() == 1) {
+                if (ppg_lines_processed[0][i + 1].get_slope_dir() == -1 && (ppg_lines_processed[0][i + 1].get_x1() - ppg_lines_processed[0][i].get_x2()) < 25)
+                    to_return->push_back(Point(ppg_lines_processed[0][i].get_x1(), ppg_lines_processed[0][i].get_period() + ppg_lines_processed[0][i + 1].get_period()));
+            }
+        }
+    }
 
 	void PPGAnalysis::linear_interpolation_with_freq(vector<double> *to_return, vector<Point> *data, int old_freq, int new_freq)
 	{
@@ -385,21 +412,23 @@ namespace PPG
 		return max;
 	}
 
-	Point PPGAnalysis::ppg_calculate_rr(Point ppg_intensity_fft_max, Point ppg_amplitude_fft_max)
+    Point PPGAnalysis::ppg_calculate_rr(Point ppg_intensity_fft_max, Point ppg_amplitude_fft_max, Point ppg_period_fft_max)
 	{
 
 		double rr_intensity = ppg_intensity_fft_max.get_x() * 60;
 		double rr_amplitude = ppg_amplitude_fft_max.get_x() * 60;
+        double rr_period = ppg_period_fft_max.get_x() * 60;
 
 		// respiratory rate is the mean of all the rr estimations
-		double rr = (rr_intensity + rr_amplitude) / 2;
+        double rr = (rr_intensity + rr_amplitude + rr_period) / 3;
 
 		// to calculate quality we calculate sd of individual rr and see if it is less the 4
 		double rr_dev_intensity = rr_intensity - rr;
 		double rr_dev_amplitude = rr_amplitude - rr;
+        double rr_dev_period = rr_period -rr;
 
 		// the standard deviation
-		double sd = sqrt((rr_dev_amplitude * rr_dev_amplitude + rr_dev_intensity * rr_dev_intensity) / 2);
+        double sd = sqrt((rr_dev_amplitude * rr_dev_amplitude + rr_dev_intensity * rr_dev_intensity + rr_dev_period * rr_dev_period) / 3);
 
 		return Point(rr, sd);
 	}
@@ -468,12 +497,19 @@ namespace PPG
 			//this->ppg_amplitude_waveform(this->ppg_red_amplitude_waveform, this->ppg_red_lines_processed);
 			this->ppg_amplitude_waveform(this->ppg_ir_amplitude_waveform, this->ppg_ir_lines_processed);
 
+            //extracting the period waveform from the processed lines
+            // this->ppg_period_waveform(this->ppg_red_period_waveform, this->ppg_red_lines_processed);
+            this->ppg_period_waveform(this->ppg_ir_period_waveform, this->ppg_ir_lines_processed);
+
 			// interpolating the waveform data from the processed lines
 			//this->linear_interpolation_with_freq(this->ppg_red_intensity_waveform_interp, this->ppg_red_intensity_waveform, this->samp_freq, 4);
 			this->linear_interpolation_with_freq(this->ppg_ir_intensity_waveform_interp, this->ppg_ir_intensity_waveform, this->samp_freq, 4);
 
 			//this->linear_interpolation_with_freq(this->ppg_red_amplitude_waveform_interp, this->ppg_red_amplitude_waveform, this->samp_freq, 4);
 			this->linear_interpolation_with_freq(this->ppg_ir_amplitude_waveform_interp, this->ppg_ir_amplitude_waveform, this->samp_freq, 4);
+
+            // this->linear_interpolation_with_freq(this->ppg_red_period_waveform_interp, this->ppg_red_period_waveform, this->samp_freq, 4);
+            this->linear_interpolation_with_freq(this->ppg_ir_period_waveform_interp, this->ppg_ir_period_waveform, this->samp_freq, 4);
 
 			// fft of the interpolated data
 			//this->ppg_waveform_fft(this->ppg_red_intensity_waveform_fft, this->ppg_red_intensity_waveform_interp, 4);
@@ -482,12 +518,18 @@ namespace PPG
 			//this->ppg_waveform_fft(this->ppg_red_amplitude_waveform_fft, this->ppg_red_amplitude_waveform_interp, 4);
 			this->ppg_waveform_fft(this->ppg_ir_amplitude_waveform_fft, this->ppg_ir_amplitude_waveform_interp, 4);
 
+            // this->ppg_waveform(this->ppg_red_period_waveform_fft, this->ppg_red_period_waveform_interp, 4);
+            this->ppg_waveform_fft(this->ppg_ir_period_waveform_fft, this->ppg_ir_period_waveform_interp, 4);
+
 			// finding maximum value in fft in range of respiratory freq
 			//this->ppg_red_intensity_fft_max = this->find_max_in_range(this->ppg_red_intensity_waveform_fft, 0.067, 1.08);
 			this->ppg_ir_intensity_fft_max = this->find_max_in_range(this->ppg_ir_intensity_waveform_fft, 0.067, 1.08);
 
 			//this->ppg_red_amplitude_fft_max = this->find_max_in_range(this->ppg_red_amplitude_waveform_fft, 0.067, 1.08);
 			this->ppg_ir_amplitude_fft_max = this->find_max_in_range(this->ppg_ir_amplitude_waveform_fft, 0.067, 1.08);
+
+            //this->ppg_red_period_fft_max = this->find_max_in_range(this->ppg_red_period_waveform_fft, 0.067, 1.08);
+            this->ppg_ir_period_fft_max = this->find_max_in_range(this->ppg_ir_period_waveform_fft, 0.067, 1.08);
 
 			// extracting the heart rate from the intensity waveform
 			this->hr = this->ppg_heart_rate(this->ppg_ir_lines_processed);
@@ -496,10 +538,10 @@ namespace PPG
 			this->spo2 = this->ppg_spo2(this->ppg_red_ac, this->ppg_red_dc, this->ppg_ir_ac, this->ppg_ir_dc);
 
 			// extracting rr from the signals
-			this->rr = this->ppg_calculate_rr(this->ppg_ir_intensity_fft_max, this->ppg_ir_amplitude_fft_max).get_x();
+            this->rr = this->ppg_calculate_rr(this->ppg_ir_intensity_fft_max, this->ppg_ir_amplitude_fft_max, this->ppg_ir_period_fft_max).get_x();
 
 			// setting the standard deviations of different heart rate variations
-			this->rr_std = this->ppg_calculate_rr(this->ppg_ir_intensity_fft_max, this->ppg_ir_amplitude_fft_max).get_y();
+            this->rr_std = this->ppg_calculate_rr(this->ppg_ir_intensity_fft_max, this->ppg_ir_amplitude_fft_max, this->ppg_ir_period_fft_max).get_y();
 		}
 		else {
 			// extracting the heart rate from the intensity waveform

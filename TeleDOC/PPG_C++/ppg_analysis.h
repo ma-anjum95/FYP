@@ -31,15 +31,21 @@ namespace PPG
 
 		Point ppg_red_amplitude_fft_max;
 		Point ppg_ir_amplitude_fft_max;
+
+        Point ppg_red_period_fft_max;
+        Point ppg_ir_period_fft_max;
 		
 		vector<PPGLines> *ppg_red_lines, *ppg_ir_lines;
 		vector<PPGLines> *ppg_red_lines_processed, *ppg_ir_lines_processed;
 		vector<Point> *ppg_red_intensity_waveform, *ppg_ir_intensity_waveform;
 		vector<Point> *ppg_red_amplitude_waveform, *ppg_ir_amplitude_waveform;
+        vector<Point> *ppg_red_period_waveform, *ppg_ir_period_waveform;
 		vector<double> *ppg_red_intensity_waveform_interp, *ppg_ir_intensity_waveform_interp;
 		vector<double> *ppg_red_amplitude_waveform_interp, *ppg_ir_amplitude_waveform_interp;
+        vector<double> *ppg_red_period_waveform_interp, *ppg_ir_period_waveform_interp;
 		vector<Point> *ppg_red_intensity_waveform_fft, *ppg_ir_intensity_waveform_fft;
 		vector<Point> *ppg_red_amplitude_waveform_fft, *ppg_ir_amplitude_waveform_fft;
+        vector<Point> *ppg_red_period_waveform_fft, *ppg_ir_period_waveform_fft;
 
 		// Results of the algorithm
 		double hr;
@@ -68,6 +74,9 @@ namespace PPG
 		// ppg amplitude waveform
 		void ppg_amplitude_waveform(vector<Point> *to_return, vector<PPGLines> *ppg_lines_processed);
 
+        // ppg frequency/period waveform
+        void ppg_period_waveform(vector<Point> *to_return, vector<PPGLines> *ppg_lines_processed);
+
 		// linear interpolation function which converts old freq to new
 		void linear_interpolation_with_freq(vector<double> *to_return, vector<Point> *data, int old_freq, int new_freq);
 
@@ -90,7 +99,7 @@ namespace PPG
 		// calculates respiratory rate from the max freq from fft
 		// The x in point is the rr
 		// The y in point is the standard deviation
-		Point ppg_calculate_rr(Point ppg_intensity_fft_max, Point ppg_amplitude_fft_max);
+        Point ppg_calculate_rr(Point ppg_intensity_fft_max, Point ppg_amplitude_fft_max, Point ppg_period_fft_max);
 
 		// helper function for calculating the magnitude of a complex number
 		double cplx_magnitude(kiss_fft_cpx num);
