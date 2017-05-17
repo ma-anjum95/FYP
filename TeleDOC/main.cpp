@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
+#include <QtTest/QTest>
 
 int main(int argc, char *argv[])
 {

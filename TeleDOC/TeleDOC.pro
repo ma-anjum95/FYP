@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     PPG_C++/ppg_analysis.cpp \
     PPG_C++/ppg_lines.cpp \
     PPG_C++/kiss_fft.c \
-    ppgworker.cpp
+    ppgworker.cpp \
+    MAX117/max30102.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -40,9 +41,16 @@ HEADERS  += \
     PPG_C++/point.h \
     PPG_C++/kiss_fft.h \
     PPG_C++/_kiss_fft_guts.h \
-    ppgworker.h
+    ppgworker.h \
+    MAX117/max30102.h
 
 FORMS    += mainwindow.ui
 
 RESOURCES += \
     images.qrc
+
+LIBS += -lbcm2835
+
+QT += testlib
+
+QMAKE_CXXFLAGS += -std=gnu++11

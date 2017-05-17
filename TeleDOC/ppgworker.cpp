@@ -2,11 +2,11 @@
 
 void PPGWorker::ppg_work()
 {
-    double tmp1, tmp2;
+    uint32_t tmp1, tmp2;
     double *interp_red, *interp_ir;
 
     if (!maxim_max30102_init()) {
-        emit ppg_device_failt();
+        emit ppg_device_fail();
     } else {
         exec_ppg_thread = true;
         emit return_ppg_status(this->exec_ppg_thread);
@@ -15,8 +15,8 @@ void PPGWorker::ppg_work()
     while(exec_ppg_thread) {
         // getting the ppg data from the sensors
         if (maxim_max30102_read_fifo(&tmp1, &tmp2)) {
-            this->ppg_red.push_back(tmp1);
-            this->ppg_ir.push_back(tmp2);
+            this->ppg_red.push_back((double)tmp1);
+            this->ppg_ir.push_back((double)tmp2);
 
             emit ppg_samples(ppg_red.size());
 
