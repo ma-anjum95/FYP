@@ -104,7 +104,7 @@ double PPGWorker::anomaly_gauss(double x, double mu, double sig)
     return (1/(sqrt(2 * M_PI) * sig)) * exp(-((x - mu) * (x - mu))/(2.0 * sig * sig));
 }
 
-double PPGWorker::anomaly(double hr, double rr, double rr_dev)
+bool PPGWorker::anomaly(double hr, double rr, double rr_dev)
 {
     double const HR_MEAN = 124.595617240614;
     double const RR_MEAN = 9.05159415743016;
