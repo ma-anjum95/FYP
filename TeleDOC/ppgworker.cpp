@@ -27,7 +27,8 @@ void PPGWorker::ppg_work()
                 ppg_analysis.run(interp_red, interp_ir, 5000, 250);
 
                 emit resultsReady(interp_red, interp_ir, ppg_analysis.get_hr(), ppg_analysis.get_rr(),
-                                  ppg_analysis.get_rr_std(), ppg_analysis.get_spo2());
+                                  ppg_analysis.get_rr_std(), ppg_analysis.get_spo2(),
+                                  this->anomaly(ppg_analysis.get_hr(), ppg_analysis.get_rr(), ppg_analysis.get_rr_std()));
 
                 this->last_index += update;
             }
@@ -96,4 +97,29 @@ double *PPGWorker::linear_interp_10(vector<double> to_interp, int start_index)
 void PPGWorker::ppg_update(const int &update)
 {
     this->update = update;
+}
+
+double PPGWorker::anomaly_gauss(double x, double mu, double sig)
+{
+    return (1/(sqrt(2 * M_PI) * sig)) * exp(-((x - mu) * (x - mu))/(2.0 * sig * sig));
+}
+
+double PPGWorker::anomaly(double hr, double rr, double rr_dev)
+{
+    double const HR_MEAN = 124.595617240614;
+    double const RR_MEAN = 9.05159415743016;
+    double const RR_DEV_MEAN = 2.56199101805027;
+
+    double const HR_STD = 26.3494843832011;
+    double const RR_STD = 2.73808772977394;
+    double const RR_DEV_STD = 2.11735336729146;
+
+    double prob_HR = this->anomaly_gauss(hr, HR_MEAN, HR_STD) * 10;
+    double prob_RR = this->anomaly_gauss(rr, RR_MEAN, RR_STD) * 10;
+    double prob_RR_STD = this->anomaly_gauss(rr_dev, RR_DEV_MEAN, RR_DEV_STD) * 10;
+
+    double final_prob = prob_HR * prob_RR * prob_RR_STD;
+
+    // if there is no anomaly return false else return true
+    return final_prob > 0.04 ? false : true;
 }

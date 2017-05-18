@@ -456,12 +456,12 @@ color: rgb(255, 255, 255);
       <item>
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>PPG Status:</string>
+         <string>Anomaly: </string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="ppg_status">
+       <widget class="QLabel" name="anomaly_status">
         <property name="font">
          <font>
           <weight>75</weight>
@@ -472,7 +472,7 @@ color: rgb(255, 255, 255);
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Off</string>
+         <string>Yes</string>
         </property>
        </widget>
       </item>

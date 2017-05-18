@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QThread>
 #include <QtTest/QtTest>
+#include <cmath>
 
 #include <fstream>
 #include "PPG_C++/ppg_analysis.h"
@@ -13,7 +14,7 @@ class PPGWorker : public QObject
 {
     Q_OBJECT
 signals:
-    void resultsReady(double *ppg_red, double *ppg_ir, double hr, double rr, double rr_std, double spo2);
+    void resultsReady(double *ppg_red, double *ppg_ir, double hr, double rr, double rr_std, double spo2, bool anomaly);
     void return_ppg_status(const bool &status);
     void ppg_samples(const int &samples);
     void ppg_device_fail();
@@ -33,6 +34,8 @@ private:
     vector<double> ppg_ir;
     signed int last_index = 0, update=125;
 
+    double anomaly_gauss(double x, double mu, double sig);
+    bool anomaly(double hr, double rr, double rr_dev);
 };
 
 #endif // PPGWORKER_H

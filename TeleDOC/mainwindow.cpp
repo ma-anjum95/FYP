@@ -110,7 +110,7 @@ void MainWindow::on_start_button_clicked()
 }
 
 void MainWindow::handle_ppg_results(double *ppg_red, double *ppg_ir,
-                    double hr, double rr, double rr_std, double spo2)
+                    double hr, double rr, double rr_std, double spo2, bool anomaly)
 {
     ui->lcdNumber_HR->display(hr);
     ui->lcdNumber_SPO2->display(spo2);
@@ -121,6 +121,11 @@ void MainWindow::handle_ppg_results(double *ppg_red, double *ppg_ir,
         this->makePlot(ppg_ir, 5000);
     else
         this->makePlot(ppg_red, 5000);
+
+    if (anomaly)
+        ui->anomaly_status->setText("Yes");
+    else
+        ui->anomaly_status->setText("No");
 }
 
 void MainWindow::ppg_status(const bool &status)
@@ -129,7 +134,6 @@ void MainWindow::ppg_status(const bool &status)
 
     if (status) {
         ui->start_button->setText("            STOP              ");
-        ui->ppg_status->setText("On");
 
         QPalette pal = ui->start_button->palette();
         pal.setColor(QPalette::Button, QColor(Qt::red));
@@ -141,7 +145,6 @@ void MainWindow::ppg_status(const bool &status)
     }
      else {
         ui->start_button->setText("            START             ");
-        ui->ppg_status->setText("Off");
 
         QPalette pal = ui->start_button->palette();
         pal.setColor(QPalette::Button, QColor(Qt::green));
