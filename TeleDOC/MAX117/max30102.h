@@ -65,8 +65,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <bcm2835.h>
-//#include <wiringPi.h>
-//#include <wiringPiI2C.h>
 
 #define I2C_WRITE_ADDR 0xAE
 #define I2C_READ_ADDR 0xAF

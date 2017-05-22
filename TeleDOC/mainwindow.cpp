@@ -56,8 +56,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    this->ppg_thread.quit();
+    this->ppg_thread.terminate();
     this->ppg_thread.wait();
+
     delete ppg_worker;
     delete ui;
 }

@@ -43,6 +43,7 @@ private:
 
 public:
     PPGWorker();
+    ~PPGWorker();
 };
 
 #endif // PPGWORKER_H

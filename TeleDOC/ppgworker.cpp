@@ -4,19 +4,27 @@ PPGWorker::PPGWorker()
 {
     this->handle = serialOpen ("/dev/ttyAMA0", 9600) ;
 
-    if (!maxim_max30102_init() || this->handle == -1) {
-        emit ppg_device_fail();
-    } else {
-        exec_ppg_thread = true;
-        emit return_ppg_status(this->exec_ppg_thread);
-    }
 
+
+}
+
+PPGWorker::~PPGWorker()
+{
+    serialClose(this->handle);
 }
 
 void PPGWorker::ppg_work()
 {
     uint32_t tmp1, tmp2;
     double *interp_red, *interp_ir;
+
+    if (!maxim_max30102_init() || this->handle == -1) {
+        emit ppg_device_fail();
+    } else {
+        exec_ppg_thread = true;
+        emit return_ppg_status(this->exec_ppg_thread);
+
+    }
 
     while(exec_ppg_thread) {
         // getting the ppg data from the sensors
@@ -25,6 +33,7 @@ void PPGWorker::ppg_work()
             this->ppg_ir.push_back((double)tmp2);
 
             emit ppg_samples(ppg_red.size());
+
 
             while (this->last_index < (signed) (this->ppg_red.size() - 500)) {
                 interp_red = linear_interp_10(this->ppg_red, this->last_index);
@@ -49,7 +58,7 @@ void PPGWorker::ppg_work()
     }
 }
 
-void sendSerialData(double hr, double rr, double rr_dev, double spo2)
+void PPGWorker::sendSerialData(double hr, double rr, double rr_dev, double spo2)
 {
     serialPrintf(this->handle,"{\"hr\": %f,\"rr\": %f,\"temp\": 0,\"spo2\": %f, \"rr_dev\": %f}", hr, rr, spo2, rr_dev);
 }

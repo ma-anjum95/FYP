@@ -49,7 +49,7 @@ FORMS    += mainwindow.ui
 RESOURCES += \
     images.qrc
 
-LIBS += -lbcm2835
+LIBS += -lbcm2835 -lwiringPi
 
 QT += testlib
 
