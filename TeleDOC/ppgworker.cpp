@@ -2,7 +2,7 @@
 
 PPGWorker::PPGWorker()
 {
-    this->handle = serialOpen ("/dev/ttyAMA0", 115200) ;
+    this->handle = serialOpen ("/dev/ttyAMA0", 9600) ;
 
     if (!maxim_max30102_init() || this->handle == -1) {
         emit ppg_device_fail();
