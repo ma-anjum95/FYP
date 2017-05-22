@@ -7,6 +7,8 @@
 #include <cmath>
 
 #include <fstream>
+#include <wiringPi.h>
+#include <wiringSerial.h>
 #include "PPG_C++/ppg_analysis.h"
 #include "MAX117/max30102.h"
 
@@ -33,9 +35,14 @@ private:
     vector<double> ppg_red;
     vector<double> ppg_ir;
     signed int last_index = 0, update=125;
+    int handle; // serial communication handler
 
     double anomaly_gauss(double x, double mu, double sig);
     bool anomaly(double hr, double rr, double rr_dev);
+    void sendSerialData(double hr, double rr, double rr_dev, double spo2);
+
+public:
+    PPGWorker();
 };
 
 #endif // PPGWORKER_H

@@ -1,16 +1,22 @@
 #include "ppgworker.h"
 
-void PPGWorker::ppg_work()
+PPGWorker::PPGWorker()
 {
-    uint32_t tmp1, tmp2;
-    double *interp_red, *interp_ir;
+    this->handle = serialOpen ("/dev/ttyAMA0", 115200) ;
 
-    if (!maxim_max30102_init()) {
+    if (!maxim_max30102_init() || this->handle == -1) {
         emit ppg_device_fail();
     } else {
         exec_ppg_thread = true;
         emit return_ppg_status(this->exec_ppg_thread);
     }
+
+}
+
+void PPGWorker::ppg_work()
+{
+    uint32_t tmp1, tmp2;
+    double *interp_red, *interp_ir;
 
     while(exec_ppg_thread) {
         // getting the ppg data from the sensors
@@ -20,7 +26,7 @@ void PPGWorker::ppg_work()
 
             emit ppg_samples(ppg_red.size());
 
-            while (this->last_index < (signed) this->ppg_red.size() - 500) {
+            while (this->last_index < (signed) (this->ppg_red.size() - 500)) {
                 interp_red = linear_interp_10(this->ppg_red, this->last_index);
                 interp_ir = linear_interp_10(this->ppg_ir, this->last_index);
 
@@ -30,13 +36,22 @@ void PPGWorker::ppg_work()
                                   ppg_analysis.get_rr_std(), ppg_analysis.get_spo2(),
                                   this->anomaly(ppg_analysis.get_hr(), ppg_analysis.get_rr(), ppg_analysis.get_rr_std()));
 
+                this->sendSerialData(ppg_analysis.get_hr(), ppg_analysis.get_rr(),
+                                     ppg_analysis.get_rr_std(), ppg_analysis.get_spo2());
+
                 this->last_index += update;
+                QApplication::processEvents();
             }
 
             // dont remove this as this will help calling other functions
             QApplication::processEvents();
         }
     }
+}
+
+void sendSerialData(double hr, double rr, double rr_dev, double spo2)
+{
+    serialPrintf(this->handle,"{\"hr\": %f,\"rr\": %f,\"temp\": 0,\"spo2\": %f, \"rr_dev\": %f}", hr, rr, spo2, rr_dev);
 }
 
 void PPGWorker::ppg_stop()

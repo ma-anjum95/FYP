@@ -58,6 +58,7 @@ MainWindow::~MainWindow()
 {
     this->ppg_thread.quit();
     this->ppg_thread.wait();
+    delete ppg_worker;
     delete ui;
 }
 
